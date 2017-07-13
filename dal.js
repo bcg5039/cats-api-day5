@@ -1,7 +1,8 @@
 const PouchDB = require('pouchdb')
-const { map } = require('ramda')
+const { map, merge } = require('ramda')
 const db = new PouchDB(process.env.COUCHDB_URL + process.env.COUCHDB_NAME)
 const pkGenerator = require('./lib/build-pk')
+PouchDB.plugin(require('pouchdb-find'))
 
 console.log('process.env.COUCHDB_NAME: ', process.env.COUCHDB_NAME)
 
@@ -28,26 +29,52 @@ function deleteCat(catId, callback) {
   deleteDoc(catId, callback)
 }
 
-function listCats(limit, callback) {
-  const options = limit
-    ? {
-        include_docs: true,
-        startkey: 'cat_',
-        endkey: 'cat_\uffff',
-        limit: limit
-      }
-    : {
-        include_docs: true,
-        startkey: 'cat_',
-        endkey: 'cat_\uffff'
-      }
+// function listCats(limit, callback) {
+//   const options = limit
+//     ? {
+//         include_docs: true,
+//         startkey: 'cat_',
+//         endkey: 'cat_\uffff',
+//         limit: limit
+//       }
+//     : {
+//         include_docs: true,
+//         startkey: 'cat_',
+//         endkey: 'cat_\uffff'
+//       }
+//
+//   list(options, callback)
+// }
 
-  list(options, callback)
+function listCats(ownerId, limit, callback) {
+  // var query = limit
+  //   ? { selector: { type: 'cat' }, limit: Number(limit) }
+  //   : { selector: { type: 'cat' } }
+
+  var query = ownerId
+    ? { selector: { ownerId } }
+    : { selector: { type: 'cat' } }
+  query = limit ? merge(query, { limit: Number(limit) }) : query
+  findDocs(query, callback)
+}
+
+function findDocs(query, callback) {
+  console.log('query: ', JSON.stringify(query, null, 2))
+  query
+    ? db.find(query).then(res => cb(null, res.docs)).catch(err => cb(err))
+    : cb(null, [])
 }
 
 //////////////////////
 //      BREEDS
 //////////////////////
+function listBreeds(limit, callback) {
+  const query = limit
+    ? { selector: { type: 'breed' }, limit: Number(limit) }
+    : { selector: { type: 'breed' } }
+  findDocs(query, callback)
+}
+
 function addBreed(breed, callback) {
   // example _id -- "breed_pixie-bob"
   breed._id = pkGenerator('breed_', trim(breed.breed))
