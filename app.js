@@ -112,7 +112,7 @@ app.delete('/cats/:id', function(req, res, next) {
 
 //   LIST - GET /cats
 app.get('/cats', function(req, res, next) {
-  const limit = pathOr(null, ['query', 'limit'], req)
+  const limit = pathOr(10, ['query', 'limit'], req)
   const ownerId = pathOr(null, ['query', 'ownerId'], req)
 
   dal.listCats(limit, function(err, data) {

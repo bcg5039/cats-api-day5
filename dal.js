@@ -54,7 +54,7 @@ function listCats(ownerId, limit, callback) {
   var query = ownerId
     ? { selector: { ownerId } }
     : { selector: { type: 'cat' } }
-  query = limit ? merge(query, { limit: Number(limit) }) : query
+  query = limit ? merge(query, { limit }) : query
   findDocs(query, callback)
 }
 
@@ -70,7 +70,7 @@ function findDocs(query, callback) {
 //////////////////////
 function listBreeds(limit, callback) {
   const query = limit
-    ? { selector: { type: 'breed' }, limit: Number(limit) }
+    ? { selector: { type: 'breed' }, limit }
     : { selector: { type: 'breed' } }
   findDocs(query, callback)
 }
