@@ -1,124 +1,80 @@
 const PouchDB = require('pouchdb')
-const { map, merge } = require('ramda')
+PouchDB.plugin(require('pouchdb-find'))
+const { map } = require('ramda')
 const db = new PouchDB(process.env.COUCHDB_URL + process.env.COUCHDB_NAME)
 const pkGenerator = require('./lib/build-pk')
-PouchDB.plugin(require('pouchdb-find'))
-
-console.log('process.env.COUCHDB_NAME: ', process.env.COUCHDB_NAME)
-
-const { append, find, reject, compose, trim } = require('ramda')
+const { append, find, reject, compose, trim, merge } = require('ramda')
 
 //////////////////////
 //      CATS
 //////////////////////
-function addCat(cat, callback) {
+const addCat = (cat, callback) => {
   // example _id -- "cat_big_time_owner_333"
   cat._id = pkGenerator('cat_', trim(cat.name) + ' ' + trim(cat.ownerId))
   add(cat, callback)
 }
+const getCat = (catId, callback) => get(catId, callback)
+const updateCat = (updatedCat, callback) => update(updatedCat, callback)
+const deleteCat = (catId, callback) => deleteDoc(catId, callback)
 
-function getCat(catId, callback) {
-  get(catId, callback)
-}
+const listCats = (lastItem, ownerId, limit, callback) => {
+  var query = {}
 
-function updateCat(updatedCat, callback) {
-  update(updatedCat, callback)
-}
+  if (ownerId) {
+    // if ownerId then this is a filter and were not going to paginate.
+    //   why?  the filter is limiting our records.  no need to paginate
+    query = { selector: { ownerId }, limit }
+  } else if (lastItem) {
+    // They are asking to paginate.  Give them the next page of results
+    query = { selector: { _id: { $gt: lastItem }, type: 'cat' }, limit }
+  } else {
+    // Give the first page of results.
+    query = { selector: { _id: { $gt: null }, type: 'cat' }, limit }
+  }
 
-function deleteCat(catId, callback) {
-  deleteDoc(catId, callback)
-}
-
-// function listCats(limit, callback) {
-//   const options = limit
-//     ? {
-//         include_docs: true,
-//         startkey: 'cat_',
-//         endkey: 'cat_\uffff',
-//         limit: limit
-//       }
-//     : {
-//         include_docs: true,
-//         startkey: 'cat_',
-//         endkey: 'cat_\uffff'
-//       }
-//
-//   list(options, callback)
-// }
-
-function listCats(ownerId, limit, callback) {
-  // var query = limit
-  //   ? { selector: { type: 'cat' }, limit: Number(limit) }
-  //   : { selector: { type: 'cat' } }
-
-  var query = ownerId
-    ? { selector: { ownerId } }
-    : { selector: { type: 'cat' } }
-  query = limit ? merge(query, { limit }) : query
+  console.log('query:', query)
   findDocs(query, callback)
-}
-
-function findDocs(query, callback) {
-  console.log('query: ', JSON.stringify(query, null, 2))
-  query
-    ? db.find(query).then(res => cb(null, res.docs)).catch(err => cb(err))
-    : cb(null, [])
 }
 
 //////////////////////
 //      BREEDS
 //////////////////////
-function listBreeds(limit, callback) {
-  const query = limit
-    ? { selector: { type: 'breed' }, limit }
-    : { selector: { type: 'breed' } }
-  findDocs(query, callback)
-}
-
-function addBreed(breed, callback) {
+const addBreed = (breed, callback) => {
   // example _id -- "breed_pixie-bob"
   breed._id = pkGenerator('breed_', trim(breed.breed))
   add(breed, callback)
 }
+const getBreed = (breedId, callback) => get(breedId, callback)
+const updateBreed = (updatedBreed, callback) => update(updatedBreed, callback)
+const deleteBreed = (breedId, callback) => deleteDoc(breedId, callback)
 
-function getBreed(breedId, callback) {
-  get(breedId, callback)
-}
+const listBreeds = (lastItem, limit, callback) => {
+  var query = {}
 
-function updateBreed(updatedBreed, callback) {
-  update(updatedBreed, callback)
-}
+  if (lastItem) {
+    // They are asking to paginate.  Give them the next page of results
+    query = { selector: { _id: { $gt: lastItem }, type: 'breed' }, limit }
+  } else {
+    // Give the first page of results.
+    query = { selector: { _id: { $gt: null }, type: 'breed' }, limit }
+  }
 
-function deleteBreed(breedId, callback) {
-  deleteDoc(breedId, callback)
-}
+  // const query = limit
+  //   ? { selector: { type: 'breed' }, limit }
+  //   : { selector: { type: 'breed' } }
 
-function listBreeds(limit, callback) {
-  const options = limit
-    ? {
-        include_docs: true,
-        startkey: 'breed_',
-        endkey: 'breed_\uffff',
-        limit: limit
-      }
-    : {
-        include_docs: true,
-        startkey: 'breed_',
-        endkey: 'breed_\uffff'
-      }
-
-  list(options, callback)
+  findDocs(query, callback)
 }
 
 ////////////////////////////
 //    helper functions
 ////////////////////////////
-function list(options, callback) {
-  db.allDocs(options, function(err, data) {
-    if (err) callback(err)
-    callback(null, map(row => row.doc, data.rows))
-  })
-}
+// function list(options, callback) {
+//   db.allDocs(options, function(err, data) {
+//     if (err) callback(err)
+//     callback(null, map(row => row.doc, data.rows))
+//   })
+// }
 
 function add(doc, callback) {
   db.put(doc, function(err, doc) {
@@ -154,6 +110,11 @@ function deleteDoc(id, callback) {
       callback(err)
     })
 }
+
+const findDocs = (query, cb) =>
+  query
+    ? db.find(query).then(res => cb(null, res.docs)).catch(err => cb(err))
+    : cb(null, [])
 
 const dal = {
   addCat,

@@ -14,25 +14,43 @@ db
     console.log('Here are the cats:')
     console.log(JSON.stringify(cats, null, 2))
   })
+  .catch(err => console.log(err))
 
 db
   .createIndex({ index: { fields: ['name'] } })
   .then(() => {
-    return db.find({ selector: { name: 'kitty' } })
+    return db.find({ selector: { name: { $gte: 'Jinx' } } })
   })
   .then(cats => {
     console.log('Created an index on the name field.')
     console.log('Here are the cats:')
     console.log(JSON.stringify(cats, null, 2))
   })
+  .catch(err => console.log(err))
 
+// fat cats
+const weightCheck = 10
 db
   .createIndex({ index: { fields: ['weightLbs'] } })
   .then(() => {
-    return db.find({ selector: { weightLbs: { $gte: 8 } } })
+    return db.find({ selector: { weightLbs: { $gte: weightCheck } } })
   })
   .then(cats => {
-    console.log('Created an index on the name field.')
-    console.log('Here are the cats:')
+    console.log('Created an index on the weightLbs field.')
+    console.log('Here are the FAT cats:')
     console.log(JSON.stringify(cats, null, 2))
   })
+  .catch(err => console.log(err))
+
+const searchCriteria = 'owner_222'
+db
+  .createIndex({ index: { fields: ['ownerId'] } })
+  .then(() => {
+    return db.find({ selector: { ownerId: searchCriteria } })
+  })
+  .then(cats => {
+    console.log('Created an index on the ownerId field.')
+    console.log('Here are the cats for owner: ', searchCriteria)
+    console.log(JSON.stringify(cats, null, 2))
+  })
+  .catch(err => console.log(err))

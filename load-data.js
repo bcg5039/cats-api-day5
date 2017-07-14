@@ -2,11 +2,17 @@ require('dotenv').config()
 
 const PouchDB = require('pouchdb')
 
-const db = new PouchDB(
-  new PouchDB(process.env.COUCHDB_URL + process.env.COUCHDB_NAME)
-)
+const db = new PouchDB(process.env.COUCHDB_URL + process.env.COUCHDB_NAME)
+
 db
   .bulkDocs([
+    {
+      _id: 'breed_american_bobtail',
+      type: 'breed',
+      breed: 'American Bobtail',
+      desc:
+        "The American Bobtail is an uncommon breed of domestic cat developed in the late 1960s. It is most notable for its stubby 'bobbed' tail about one-third to one-half the length of a normal cat's tail."
+    },
     {
       _id: 'breed_pixie-bob',
       type: 'breed',
@@ -16,14 +22,35 @@ db
     {
       _id: 'breed_siamese',
       type: 'breed',
-      breed: 'siamese',
-      desc: 'siamese cat desc'
+      breed: 'Siamese',
+      desc:
+        'The Siamese cat is one of the first distinctly recognized breeds of Asian cat. Derived from the rtgs: wichianmat landrace, one of several varieties of cat native to Thailand.'
     },
     {
-      _id: 'breed_bombay',
+      _id: 'breed_tabby',
+
       type: 'breed',
-      breed: 'bombay',
-      desc: 'This breed is bad luck!'
+      breed: 'tabby',
+      desc: 'Stripped cat...'
+    },
+    {
+      _id: 'cat_fluffikins_owner_1234',
+
+      type: 'cat',
+      name: 'fluffikins',
+      ownerId: 'owner_1234',
+      weightLbs: 8,
+      breedId: 'breed_siamese'
+    },
+    {
+      _id: 'cat_jinx_owner_111',
+
+      type: 'cat',
+      name: 'Jinx',
+      ownerId: 'owner_111',
+      weightLbs: 8,
+      breedId: 'breed_tabby',
+      gender: 'M'
     },
     {
       _id: 'cat_tootles_owner_2222',
@@ -35,113 +62,80 @@ db
       gender: 'F'
     },
     {
-      _id: 'breed_tabby',
-      type: 'breed',
-      breed: 'tabby',
-      desc: 'This breed uses too many browser tabs at once!'
-    },
-    {
-      _id: 'cat_sparkles_owner_1111',
+      _id: 'cat_fluffy_owner_2222',
       type: 'cat',
-      name: 'sparkles',
-      ownerId: 'owner_1111',
-      weightLbs: 10,
-      breedId: 'breed_bombay',
+      name: 'fluffy',
+      ownerId: 'owner_2222',
+      weightLbs: 3,
+      breedId: 'breed_tabby',
       gender: 'F'
     },
     {
-      _id: 'cat_jellybean_owner_4444',
+      _id: 'cat_jr_owner_2222',
       type: 'cat',
-      name: 'jellybean',
-      ownerId: 'owner_4444',
-      weightLbs: 9,
-      breedId: 'breed_bombay',
-      gender: 'F'
-    },
-    {
-      _id: 'cat_buttson_owner_5555',
-      type: 'cat',
-      name: 'buttson',
-      ownerId: 'owner_5555',
-      weightLbs: 10,
-      breedId: 'breed_bombay',
+      name: 'jr',
+      ownerId: 'owner_2222',
+      weightLbs: 12,
+      breedId: 'breed_siamese',
       gender: 'M'
     },
     {
-      _id: 'cat_redcat_owner_6666',
+      _id: 'cat_fatty_butterpants_owner_2222',
       type: 'cat',
-      name: 'redcat',
-      ownerId: 'owner_6666',
-      weightLbs: 10,
-      breedId: 'breed_siamese',
-      gender: 'F'
+      name: 'Fatty Butterpants',
+      ownerId: 'owner_2222',
+      weightLbs: 22,
+      breedId: 'breed_tabby',
+      gender: 'M'
     },
     {
-      _id: 'cat_kitty_owner_3333',
+      _id: 'cat_nancy_owner_2222',
       type: 'cat',
-      name: 'kitty',
-      ownerId: 'owner_3333',
-      weightLbs: 10,
-      breedId: 'breed_siamese',
-      gender: 'F'
-    },
-    {
-      _id: 'cat_pebbles_owner_7777',
-      type: 'cat',
-      name: 'pebbles',
-      ownerId: 'owner_7777',
-      weightLbs: 10,
+      name: 'Nancy',
+      ownerId: 'owner_111',
+      weightLbs: 14,
       breedId: 'breed_tabby',
       gender: 'F'
     },
     {
-      _id: 'cat_fluffy_owner_8888',
+      _id: 'cat_tom_owner_2222',
       type: 'cat',
-      name: 'fluffy',
-      ownerId: 'owner_8888',
-      weightLbs: 7,
-      breedId: 'breed_bombay',
-      gender: 'F'
+      name: 'Tom',
+      ownerId: 'owner_111',
+      weightLbs: 11,
+      breedId: 'breed_tabby',
+      gender: 'M'
     },
     {
-      _id: 'cat_catty_owner_9999',
+      _id: 'cat_muffin_owner_2222',
       type: 'cat',
-      name: 'catty',
-      ownerId: 'owner_9999',
-      weightLbs: 10,
-      breedId: 'breed_bombay',
-      gender: 'F'
-    },
-    {
-      _id: 'cat_zecat_owner_1010',
-      type: 'cat',
-      name: 'zecat',
-      ownerId: 'owner_1010',
-      weightLbs: 6,
+      name: 'Muffin',
+      ownerId: 'owner_111',
+      weightLbs: 15,
       breedId: 'breed_tabby',
       gender: 'F'
     },
     {
-      _id: 'cat_fatasscat_owner_1001',
+      _id: 'cat_rj_owner_2222',
       type: 'cat',
-      name: 'fatasscat',
-      ownerId: 'owner_1001',
-      weightLbs: 50,
+      name: 'RJ',
+      ownerId: 'owner_1234',
+      weightLbs: 15,
       breedId: 'breed_tabby',
-      gender: 'F'
+      gender: 'M'
     },
     {
-      _id: 'cat_fluffers_owner_2020',
+      _id: 'cat_jimi_hendrix_owner_2222',
       type: 'cat',
-      name: 'fluffers',
-      ownerId: 'owner_2020',
-      weightLbs: 30,
-      breedId: 'breed_bombay',
-      gender: 'F'
+      name: 'Jimi Hendrix',
+      ownerId: 'owner_1234',
+      weightLbs: 17,
+      breedId: 'breed_tabby',
+      gender: 'M'
     }
   ])
   .then(function(result) {
-    console.log('attempting to load data. Inspect each result item below:')
+    console.log('attempting to load data. Inspect each result item below: ')
     console.log(JSON.stringify(result, null, 2))
   })
   .catch(function(err) {
